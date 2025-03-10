@@ -62,6 +62,35 @@ namespace AuctionService.Controllers
 
             if (auction == null) return NotFound();
 
+            return Ok(_mapper.Map<AuctionModel>(auction));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAuction(CreateAuctionModel auctionDto)
+        {
+            var auction = _mapper.Map<Auction>(auctionDto);
+
+            // after we have identity framework
+            //auction.Seller = User.Identity.Name;
+
+            _context.Add(auction);
+
+            var newAuction = _mapper.Map<AuctionModel>(auction);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("Could not save changes to the DB");
+
+            return CreatedAtAction(nameof(GetAuctionById), new { auction.Id }, newAuction);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAuction(Guid id, UpdateAuctionModel updateAuctionDto)
+        {
+            var auction = await _context.Auctions.Include(x => x.Item).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (auction == null) return NotFound();
+
             // after we have identity framework
             //if (auction.Seller != User.Identity?.Name) return Forbid();
 
