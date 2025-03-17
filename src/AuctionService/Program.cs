@@ -23,6 +23,9 @@ builder.Services.AddMassTransit(x =>
         o.UseBusOutbox();
     });
 
+    // This gives the names to the exchanges
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureEndpoints(context);
