@@ -13,6 +13,12 @@ namespace SearchService.Data
             await DB.InitAsync("SearchDb",
                 MongoClientSettings.FromConnectionString(app.Configuration.GetConnectionString("MongoDbConnection")));
 
+            await DB.Index<Item>()
+                .Key(x => x.Make, KeyType.Text)
+                .Key(x => x.Model, KeyType.Text)
+                .Key(x => x.Color, KeyType.Text)
+                .CreateAsync();
+
             using var scope = app.Services.CreateScope();
 
             var httpClient = scope.ServiceProvider.GetRequiredService<AuctionSvcHttpClient>();
