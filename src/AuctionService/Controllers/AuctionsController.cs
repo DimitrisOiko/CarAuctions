@@ -37,13 +37,13 @@ namespace AuctionService.Controllers
             return Ok(_mapper.Map<AuctionModel>(auction));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateAuction(CreateAuctionModel auctionDto)
         {
             var auction = _mapper.Map<Auction>(auctionDto);
-
-            // after we have identity framework
-            //auction.Seller = User.Identity.Name;
+            
+            auction.Seller = User.Identity.Name;
 
             _context.Add(auction);
 
@@ -58,6 +58,7 @@ namespace AuctionService.Controllers
             return CreatedAtAction(nameof(GetAuctionById), new { auction.Id }, newAuction);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuction(Guid id, UpdateAuctionModel updateAuctionDto)
         {
@@ -65,8 +66,7 @@ namespace AuctionService.Controllers
 
             if (auction == null) return NotFound();
 
-            // after we have identity framework
-            //if (auction.Seller != User.Identity?.Name) return Forbid();
+            if (auction.Seller != User.Identity?.Name) return Forbid();
 
             auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
             auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
@@ -80,18 +80,18 @@ namespace AuctionService.Controllers
 
             if (result) return Ok();
 
-            return BadRequest("Problem saving changes");
+            return Ok(_mapper.Map<AuctionModel>(auction));
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuction(Guid id)
         {
             var auction = await _context.Auctions.FindAsync(id);
 
             if (auction == null) return NotFound();
-
-            // after we have identity framework
-            //if (auction.Seller != User.Identity?.Name) return Forbid();
+            
+            if (auction.Seller != User.Identity?.Name) return Forbid();
 
             _context.Auctions.Remove(auction);
 
