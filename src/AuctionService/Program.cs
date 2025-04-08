@@ -25,7 +25,7 @@ builder.Services.AddMassTransit(x =>
     });
 
     // This gives the names to the exchanges
-    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
 
     x.UsingRabbitMq((context, cfg) =>
     {
